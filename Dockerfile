@@ -19,5 +19,4 @@ ADD ./analysis_scripts /opt/analysis_scripts
 ADD ./config /opt/config
 CMD ["Rscript", "--default-packages=base,utils,grDevices,graphics,stats,methods", "/opt/analysis_scripts/run_FG_SCnorm.R"]
 
-
 RUN apt-get clean

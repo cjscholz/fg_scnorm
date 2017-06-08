@@ -9,8 +9,6 @@ library(reshape2)
 # library(Matrix)
 library(SCnorm)
 
-# variables
-appTag <- "SCnorm"
 
 # functions
 readFG <- function(countFile) {
@@ -63,12 +61,10 @@ writeFG <- function(countMatrix, countFile) {
 # load the parameters required for analysis
 
 setwd("/opt/config/")
-setwd("C:/Users/scholzcl/Documents/GitHub/fg_scnorm/config")
 SCnormParams <- yaml.load_file("SCnorm_config.yml")
 
 
 setwd("/fastgenomics/input")
-setwd("C:/Users/scholzcl/Downloads/Geissmann_with_published_clusters_and_custom_clustering_Schema_Version_2_1")
 # load:
 # - expression matrix
 countMatrix <- readFG(countFile = SCnormParams$EXPRESSION_FILE_NAME)
@@ -87,14 +83,17 @@ colnames(cell_metadata) <- sapply(tmp, "[[", 1)
 manifest <- yaml.load_file(SCnormParams$MANIFEST_FILE_NAME)
 
 cell_conditions <- if("batch_column" %in% names(manifest$data$cell_metadata)) {
-  cell_metadata[, manifest$data$cell_metadata$batch_column]
+  factor(cell_metadata[, manifest$data$cell_metadata$batch_column])
 } else {
-  NULL
+  factor(rep(1, ncol(countMatrix)))
 }
+
 
 #################################################
 ## Calculations
 #################################################
+
+setwd("/fastgenomics/output")
 
 # normalize the data
 normCountMatrix <- SCnorm(Data = countMatrix, 
@@ -121,3 +120,12 @@ normCountMatrix <- SCnorm(Data = countMatrix,
 setwd("/fastgenomics/output")
 # write:
 # - normalized expression matrix
+writeFG(countMatrix = normCountMatrix[["NormalizedData"]], 
+        countFile = paste(SCnormParams$APP_NAME, SCnormParams$EXPRESSION_FILE_NAME,  sep = "."))
+
+
+#################################################
+## Fnished
+#################################################
+
+q("no")
